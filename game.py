@@ -1,18 +1,22 @@
 #!/usr/bin/python
 import os
 import platform
+from colors import bcolors
 
+ 
 turn = 1 # 1 - Player 1 | 2 - Player 2
 clean = ('clear','cls')[platform.system() == 'Windows']
-p_char = 'X'
-c_char = 'O'
+p_char = f"{bcolors.OKGREEN}X{bcolors.ENDC}"
+c_char = f"{bcolors.FAIL}O{bcolors.ENDC}"
 table = ['1','2','3',
          '4','5','6',
          '7','8','9']
 
 def winner():
     global table
-    for i in ['X','O']:
+    global p_char
+    global c_char
+    for i in [p_char,c_char]:
         # horizontal
         if table[0] == table[1] == table[2] == i: return i
         if table[3] == table[4] == table[5] == i: return i
@@ -29,21 +33,23 @@ def winner():
 def view():
     global table
     
-    print(" %s | %s | %s " % (table[0],table[1],table[2]))
-    print ("---+---+---")
-    print (" %s | %s | %s " % (table[3],table[4],table[5]))
-    print ("---+---+---")
-    print (" %s | %s | %s " % (table[6],table[7],table[8]))
+    print("  %s │ %s │ %s " % (table[0],table[1],table[2]))
+    print("────┼───┼───")
+    print("  %s │ %s │ %s " % (table[3],table[4],table[5]))
+    print("────┼───┼───")
+    print("  %s │ %s │ %s \n" % (table[6],table[7],table[8]))
 
 def move(pos):
     global turn
     global table
+    global p_char
+    global c_char
     
     if not pos: return None
     if not 0 < pos < 10: return False
-    if table[pos-1] in ['X','O']: return False
+    if table[pos-1] in [p_char,c_char]: return False
 
-    table[pos-1] = ('O','X')[turn == 1]
+    table[pos-1] = (c_char,p_char)[turn == 1]
     turn = (1,2)[turn == 1]
 
 while True:
