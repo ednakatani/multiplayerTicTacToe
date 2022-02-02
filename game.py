@@ -1,9 +1,11 @@
 #!/usr/bin/python
-import os
+from os import system, name
 import platform
+import menumaker
+import socket
 from colors import bcolors
 
- 
+player = 1
 turn = 1 # 1 - Player 1 | 2 - Player 2
 clean = ('clear','cls')[platform.system() == 'Windows']
 p_char = f"{bcolors.OKGREEN}X{bcolors.ENDC}"
@@ -11,6 +13,14 @@ c_char = f"{bcolors.FAIL}O{bcolors.ENDC}"
 table = ['1','2','3',
          '4','5','6',
          '7','8','9']
+
+
+def cls():
+    if name == 'nt':
+        _ = system('cls')
+    else:
+        _ = system('clear')
+
 
 def winner():
     global table
@@ -52,21 +62,31 @@ def move(pos):
     table[pos-1] = (c_char,p_char)[turn == 1]
     turn = (1,2)[turn == 1]
 
-while True:
-    os.system(clean)
-    view()
 
-    print ("Player %s: " % turn)
-    movement = int(input())
-    move(movement)
+def host():
+    return 0
 
-    win = winner()
-    if not win: continue
-    if win == p_char:
-        print ("Player 1 Wins!")
-        input()
-        exit()
-    if win == c_char:
-        print ("Player 2 Wins!")
-        input()
-        exit()
+def client():
+
+    while True:
+        cls()
+        view()
+
+        print ("Player %s: " % turn)
+        movement = int(input())
+        move(movement)
+
+        win = winner()
+        if not win: continue
+        if win == p_char:
+            print ("Player 1 Wins!")
+            input()
+            exit()
+        if win == c_char:
+            print ("Player 2 Wins!")
+            input()
+            exit()
+
+menu = menumaker.Menu("TIC-TAC-TOE", True,[["Host",host],["Client",client]])
+
+menu.menu()
