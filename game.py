@@ -93,12 +93,11 @@ def host():
     
     while not winner():
         
-        #cls()
+        cls()
         view()
 
         if  start == 2:
             send(con, "10")
-            print ("Player 2 start")
             start = 0
 
         else:
@@ -107,6 +106,10 @@ def host():
             move(movement)
             send(con, movement)
 
+        cls()
+        view()
+
+        print ("Waiting...")
 
         msg = recive(con)
 
@@ -134,22 +137,24 @@ def client():
 
     while not winner():
         
-        #cls()
+        cls()
         view()
 
         msg = recive(tcp)
 
         move(int(msg))
 
-        #cls()
+        cls()
         view()
+
+        print ("Waiting...")
 
         print ("Your turn")
         movement = int(input("> "))
         move(movement)
         send(tcp, movement)
 
-    print ('Finalizando conexao do cliente', cliente)
+    #print ('Finalizando conexao do cliente', cliente)
 
     tcp.close()
 
