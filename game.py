@@ -1,4 +1,3 @@
-#!/usr/bin/python
 from os import system, name
 import menumaker
 import random
@@ -6,12 +5,10 @@ import socket
 from colors import bcolors
 
 
-PLAYER = 1
-HOST = '127.0.0.1'              
+PLAYER = 1           
 PORT = 6589
+host = '127.0.0.1'
 
-con = 0
-cliente = 0
 turn = 1 # 1 - Player 1 | 2 - Player 2
 p_char = f"{bcolors.OKGREEN}X{bcolors.ENDC}"
 c_char = f"{bcolors.FAIL}O{bcolors.ENDC}"
@@ -46,8 +43,10 @@ def winner():
 
 def view():
     global table
+
     
-    print("  %s │ %s │ %s " % (table[0],table[1],table[2]))
+    
+    print("\n  %s │ %s │ %s " % (table[0],table[1],table[2]))
     print("────┼───┼───")
     print("  %s │ %s │ %s " % (table[3],table[4],table[5]))
     print("────┼───┼───")
@@ -76,20 +75,24 @@ def recive(conn: socket):
 def rand():
     return random.randint(1,2)
 
-def host():
+def run_host():
 
     start = rand()
 
     tcp = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    orig = (HOST, PORT)
+    
+    orig = (host, PORT)
     tcp.bind(orig)
     tcp.listen(1)
+
+    print("IP:",socket.gethostbyname(socket.gethostname()))
+    print("PORT:", PORT)
+    print ("Waiting Client ...")
     
     con, cliente = tcp.accept()
     
-    print ('Concetado por', cliente)
+    #print ('Concetado por', cliente)
 
-    
     while not winner():
         
         cls()
@@ -114,9 +117,9 @@ def host():
 
         move(int(msg))
         
-        print (cliente, msg)
+        #print (cliente, msg)
 
-    print ('Finalizando conexao do cliente', cliente)
+    #print ('Finalizando conexao do cliente', cliente)
 
     con.close()
 
@@ -128,10 +131,10 @@ def host():
         print ("Player 2 Wins!")
 
     
-def client():
+def run_client():
 
     tcp = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    dest = (HOST, PORT)
+    dest = (host, PORT)
     tcp.connect(dest)
 
     while not winner():
@@ -167,6 +170,6 @@ def client():
 
 
 
-menu = menumaker.Menu("TIC-TAC-TOE", True,[["Host",host],["Client",client]])
+menu = menumaker.Menu("TIC-TAC-TOE", True,[["Host",run_host],["Client",run_client]])
 
 menu.menu()
