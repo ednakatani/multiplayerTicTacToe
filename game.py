@@ -1,13 +1,18 @@
 #!/usr/bin/python
 from os import system, name
-import platform
 import menumaker
+import random
 import socket
 from colors import bcolors
 
-player = 1
+
+PLAYER = 1
+HOST = '127.0.0.1'              
+PORT = 6589
+
+con = 0
+cliente = 0
 turn = 1 # 1 - Player 1 | 2 - Player 2
-clean = ('clear','cls')[platform.system() == 'Windows']
 p_char = f"{bcolors.OKGREEN}X{bcolors.ENDC}"
 c_char = f"{bcolors.FAIL}O{bcolors.ENDC}"
 table = ['1','2','3',
@@ -20,7 +25,6 @@ def cls():
         _ = system('cls')
     else:
         _ = system('clear')
-
 
 def winner():
     global table
@@ -62,30 +66,102 @@ def move(pos):
     table[pos-1] = (c_char,p_char)[turn == 1]
     turn = (1,2)[turn == 1]
 
+def send(conn: socket, data: str):
+    conn.send(str(data).encode())
+
+def recive(conn: socket):
+    msg = conn.recv(1024)
+    return msg.decode()
+
+def rand():
+    return random.randint(1,2)
 
 def host():
-    return 0
 
-def client():
+    start = rand()
+    print(start)
 
-    while True:
-        cls()
+    tcp = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    orig = (HOST, PORT)
+    tcp.bind(orig)
+    tcp.listen(1)
+    
+    con, cliente = tcp.accept()
+    
+    print ('Concetado por', cliente)
+
+    
+    while not winner():
+        
+        #cls()
         view()
 
-        print ("Player %s: " % turn)
-        movement = int(input())
-        move(movement)
+        if  start == 2:
+            send(con, "10")
+            print ("Player 2 start")
+            start = 0
 
-        win = winner()
-        if not win: continue
-        if win == p_char:
-            print ("Player 1 Wins!")
-            input()
-            exit()
-        if win == c_char:
-            print ("Player 2 Wins!")
-            input()
-            exit()
+        else:
+            print ("Your turn")
+            movement = int(input("> "))
+            move(movement)
+            send(con, movement)
+
+
+        msg = recive(con)
+
+        move(int(msg))
+        
+        print (cliente, msg)
+
+    print ('Finalizando conexao do cliente', cliente)
+
+    con.close()
+
+    win = winner()
+    if win == p_char:
+        print ("Player 1 Wins!")
+
+    if win == c_char:
+        print ("Player 2 Wins!")
+
+    
+def client():
+
+    tcp = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    dest = (HOST, PORT)
+    tcp.connect(dest)
+
+    while not winner():
+        
+        #cls()
+        view()
+
+        msg = recive(tcp)
+
+        move(int(msg))
+
+        #cls()
+        view()
+
+        print ("Your turn")
+        movement = int(input("> "))
+        move(movement)
+        send(tcp, movement)
+
+    print ('Finalizando conexao do cliente', cliente)
+
+    tcp.close()
+
+    win = winner()
+    if win == p_char:
+        print ("Player 1 Wins!")
+
+    if win == c_char:
+        print ("Player 2 Wins!")
+
+
+
 
 menu = menumaker.Menu("TIC-TAC-TOE", True,[["Host",host],["Client",client]])
 
