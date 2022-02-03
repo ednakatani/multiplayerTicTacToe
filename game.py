@@ -79,7 +79,6 @@ def rand():
 def host():
 
     start = rand()
-    print(start)
 
     tcp = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     orig = (HOST, PORT)
@@ -140,14 +139,14 @@ def client():
         cls()
         view()
 
+        print ("Waiting...")
+
         msg = recive(tcp)
 
         move(int(msg))
 
         cls()
         view()
-
-        print ("Waiting...")
 
         print ("Your turn")
         movement = int(input("> "))
