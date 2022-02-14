@@ -10,6 +10,7 @@ PORT = 6589
 host = '127.0.0.1'
 
 turn = 1 # 1 - Player 1 | 2 - Player 2
+moves = 0
 p_char = f"{bcolors.OKGREEN}X{bcolors.ENDC}"
 c_char = f"{bcolors.FAIL}O{bcolors.ENDC}"
 table = ['1','2','3',
@@ -24,6 +25,7 @@ def cls():
         _ = system('clear')
 
 def winner():
+
     global table
     global p_char
     global c_char
@@ -39,13 +41,27 @@ def winner():
         # diagonal
         if table[0] == table[4] == table[8] == i: return i
         if table[6] == table[4] == table[2] == i: return i
-    return None
+    return False
 
+def tie():
+    global moves
+    if moves >= 9:
+        return True
+    else:
+        return False
+
+def win_game():
+    global p_char
+    global c_char
+    if winner() in [p_char,c_char]: 
+        return True
+    else:
+        return False
+    
 def view():
     global table
+    global moves
 
-    
-    
     print("\n  %s │ %s │ %s " % (table[0],table[1],table[2]))
     print("────┼───┼───")
     print("  %s │ %s │ %s " % (table[3],table[4],table[5]))
@@ -57,11 +73,13 @@ def move(pos):
     global table
     global p_char
     global c_char
+    global moves
     
     if not pos: return None
     if not 0 < pos < 10: return False
     if table[pos-1] in [p_char,c_char]: return False
 
+    moves += 1
     table[pos-1] = (c_char,p_char)[turn == 1]
     turn = (1,2)[turn == 1]
 
@@ -75,13 +93,23 @@ def recive(conn: socket):
 def rand():
     return random.randint(1,2)
 
+def reset():
+    global table
+    global moves
+    moves = 0
+    table = ['1','2','3',
+         '4','5','6',
+         '7','8','9']
+
 def run_host():
+
+    reset()
 
     start = rand()
 
     tcp = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     
-    orig = (host, PORT)
+    orig = (socket.gethostbyname(socket.gethostname()), PORT)
     tcp.bind(orig)
     tcp.listen(1)
 
@@ -93,9 +121,11 @@ def run_host():
     
     #print ('Concetado por', cliente)
 
-    while not winner():
+    while not win_game() and not tie():
         
         cls()
+        print("win >",win_game(), "tie >", tie())
+        print("moves >",moves)
         view()
 
         if  start == 2:
@@ -109,6 +139,10 @@ def run_host():
             send(con, movement)
 
         cls()
+
+        print("win >",win_game(), "tie >", tie())
+        print("moves >",moves)
+
         view()
 
         print ("Waiting...")
@@ -126,18 +160,24 @@ def run_host():
     win = winner()
     if win == p_char:
         print ("Player 1 Wins!")
-
-    if win == c_char:
+    elif win == c_char:
         print ("Player 2 Wins!")
+    else:
+        print("It's a tie!")
 
     
 def run_client():
+
+    reset()
+
+    print("HOST IP")
+    host = input("> ")
 
     tcp = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     dest = (host, PORT)
     tcp.connect(dest)
 
-    while not winner():
+    while not win_game() and not tie():
         
         cls()
         view()
@@ -163,9 +203,10 @@ def run_client():
     win = winner()
     if win == p_char:
         print ("Player 1 Wins!")
-
-    if win == c_char:
+    elif win == c_char:
         print ("Player 2 Wins!")
+    else:
+        print("It's a tie!")
 
 
 
