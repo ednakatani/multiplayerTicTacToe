@@ -95,6 +95,8 @@ def move(pos):
     global c_char
     global moves
     
+    try: pos = int(pos)
+    except: return False
     if not pos: return False
     if not 0 < pos < 10: return False
     if table[pos-1] in [p_char,c_char]: return False
@@ -165,7 +167,7 @@ def run_host():
             print ("Your turn")
             c = True
             while c:
-                movement = int(input("> "))
+                movement = input("> ")
                 if move(movement):
                     c = False
             send(con, movement)
@@ -221,7 +223,7 @@ def run_client():
 
         c = True
         while c:
-            movement = int(input("> "))
+            movement = input("> ")
             if move(movement):
                 c = False
 
