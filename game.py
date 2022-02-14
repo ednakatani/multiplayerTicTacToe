@@ -167,8 +167,11 @@ def run_host():
 
         else:
             print ("Your turn")
-            movement = int(input("> "))
-            move(movement)
+            c = True
+            while c:
+                movement = int(input("> "))
+                if move(movement):
+                    c = False
             send(con, movement)
 
         cls()
@@ -219,8 +222,13 @@ def run_client():
         view()
 
         print ("Your turn")
-        movement = int(input("> "))
-        move(movement)
+
+        c = True
+        while c:
+            movement = int(input("> "))
+            if move(movement):
+                c = False
+
         send(tcp, movement)
 
 
