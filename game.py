@@ -151,14 +151,10 @@ def run_host():
     print ("Waiting Client ...")
     
     con, cliente = tcp.accept()
-    
-    #print ('Concetado por', cliente)
 
     while not win_game() and not tie():
         
         cls()
-        print("win >",win_game(), "tie >", tie())
-        print("moves >",moves)
         view()
 
         if  start == 2:
