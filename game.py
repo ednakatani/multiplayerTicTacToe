@@ -19,12 +19,19 @@ table = ['1','2','3',
 
 
 def cls():
+    """
+    Clear the screen
+    """
     if name == 'nt':
         _ = system('cls')
     else:
         _ = system('clear')
 
 def winner():
+    """
+    Check if anyone has won
+    Returning char or bool
+    """
 
     global table
     global p_char
@@ -44,6 +51,9 @@ def winner():
     return False
 
 def tie():
+    """
+    Check if the game is tied
+    """
     global moves
     if moves >= 9:
         return True
@@ -51,6 +61,10 @@ def tie():
         return False
 
 def win_game():
+    """
+    Check if anyone has won
+    Returning only bool
+    """
     global p_char
     global c_char
     if winner() in [p_char,c_char]: 
@@ -59,6 +73,9 @@ def win_game():
         return False
     
 def view():
+    """
+    Print the game board
+    """
     global table
     global moves
 
@@ -69,31 +86,47 @@ def view():
     print("  %s │ %s │ %s \n" % (table[6],table[7],table[8]))
 
 def move(pos):
+    """
+    Changes the value of the char in the game list
+    """
     global turn
     global table
     global p_char
     global c_char
     global moves
     
-    if not pos: return None
+    if not pos: return False
     if not 0 < pos < 10: return False
     if table[pos-1] in [p_char,c_char]: return False
 
     moves += 1
     table[pos-1] = (c_char,p_char)[turn == 1]
     turn = (1,2)[turn == 1]
+    return True
 
 def send(conn: socket, data: str):
+    """
+    Send data thru a socket 
+    """
     conn.send(str(data).encode())
 
 def recive(conn: socket):
+    """
+    Wait and recieves data of a socket
+    """
     msg = conn.recv(1024)
     return msg.decode()
 
 def rand():
+    """
+    Generate a random number (1 or 2)
+    """
     return random.randint(1,2)
 
 def reset():
+    """
+    Reset the table and moves variables
+    """
     global table
     global moves
     moves = 0
@@ -140,9 +173,6 @@ def run_host():
 
         cls()
 
-        print("win >",win_game(), "tie >", tie())
-        print("moves >",moves)
-
         view()
 
         print ("Waiting...")
@@ -151,9 +181,6 @@ def run_host():
 
         move(int(msg))
         
-        #print (cliente, msg)
-
-    #print ('Finalizando conexao do cliente', cliente)
 
     con.close()
 
@@ -196,7 +223,6 @@ def run_client():
         move(movement)
         send(tcp, movement)
 
-    #print ('Finalizando conexao do cliente', cliente)
 
     tcp.close()
 
